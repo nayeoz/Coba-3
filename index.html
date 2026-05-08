@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>DigiChem</title>
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    body{
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg,#0f172a,#1e3a8a);
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:20px;
+    }
+
+    .container{
+      width:100%;
+      max-width:700px;
+    }
+
+    h1{
+      color:white;
+      text-align:center;
+      font-size:42px;
+      margin-bottom:10px;
+    }
+
+    .subtitle{
+      text-align:center;
+      color:#cbd5e1;
+      margin-bottom:30px;
+    }
+
+    .card{
+      background:white;
+      padding:30px;
+      border-radius:20px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    label{
+      display:block;
+      margin-bottom:10px;
+      font-weight:bold;
+      color:#1e3a8a;
+    }
+
+    select,
+    input{
+      width:100%;
+      padding:14px;
+      border-radius:12px;
+      border:1px solid #cbd5e1;
+      margin-bottom:18px;
+      font-size:16px;
+    }
+
+    input:focus,
+    select:focus{
+      outline:none;
+      border-color:#2563eb;
+    }
+
+    button{
+      width:100%;
+      padding:15px;
+      border:none;
+      border-radius:12px;
+      background:#2563eb;
+      color:white;
+      font-size:17px;
+      font-weight:bold;
+      cursor:pointer;
+      transition:0.3s;
+    }
+
+    button:hover{
+      background:#1d4ed8;
+    }
+
+    #hasil{
+      margin-top:25px;
+      padding:20px;
+      border-radius:15px;
+      background:#dbeafe;
+      color:#1e3a8a;
+      font-size:20px;
+      font-weight:bold;
+      text-align:center;
+    }
+
+    .form-title{
+      font-size:18px;
+      margin-bottom:15px;
+      color:#1e3a8a;
+      font-weight:bold;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>🧪 DigiChem</h1>
+
+    <p class="subtitle">
+      Digital Chemistry Calculator
+    </p>
+
+    <div class="card">
+
+      <label>Pilih Kalkulator</label>
+
+      <select id="menu" onchange="ubahForm()">
+
+        <option value="normalitas">
+          Normalitas
+        </option>
+
+        <option value="molaritas">
+          Molaritas
+        </option>
+
+        <option value="be">
+          BE (Berat Ekivalen)
+        </option>
+
+        <option value="bm">
+          BM (Berat Molekul)
+        </option>
+
+        <option value="ar">
+          Ar (Massa Atom Relatif)
+        </option>
+
+        <option value="suhu">
+          Konversi Suhu
+        </option>
+
+        <option value="ppm">
+          PPM
+        </option>
+
+      </select>
+
+      <div id="formArea"></div>
+
+      <button onclick="hitung()">
+        Hitung
+      </button>
+
+      <div id="hasil">
+        Hasil akan muncul di sini
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+
+    // =====================================
+    // DATA Ar
+    // =====================================
+
+    const dataAr = {
+      H: 1,
+      C: 12,
+      N: 14,
+      O: 16,
+      Na: 23,
+      Mg: 24,
+      Al: 27,
+      Si: 28,
+      P: 31,
+      S: 32,
+      Cl: 35.5,
+      K: 39,
+      Ca: 40,
+      Fe: 56,
+      Cu: 63.5,
+      Zn: 65
+    };
+
+    // =====================================
+    // INPUT ANGKA
+    // =====================================
+
+    function angka(id){
+
+      let nilai = document
+        .getElementById(id)
+        .value
+        .replace(",", ".");
+
+      return parseFloat(nilai);
+    }
+
+    // =====================================
+    // HITUNG BM
+    // =====================================
+
+    function hitungBM(rumus){
+
+      let total = 0;
+
+      let regex = /([A-Z][a-z]?)(\d*)/g;
+
+      let cocok;
+
+      while((cocok = regex.exec(rumus)) !== null){
+
+        let unsur = cocok[1];
+
+        let jumlah = cocok[2] || 1;
+
+        if(dataAr[unsur]){
+
+          total += dataAr[unsur] * jumlah;
+        }
+      }
+
+      return total;
+    }
+
+    // =====================================
+    // FORM DINAMIS
+    // =====================================
+
+    function ubahForm(){
+
+      let menu = document
+        .getElementById("menu")
+        .value;
+
+      let form = document
+        .getElementById("formArea");
+
+      // NORMALITAS
+
+      if(menu === "normalitas"){
+
+        form.innerHTML = `
+          <div class="form-title">
+            Kalkulator Normalitas
+          </div>
+
+          <input type="text" id="massa"
+          placeholder="Massa zat (gram)">
+
+          <input type="text" id="be"
+          placeholder="Berat Ekivalen (BE)">
+
+          <input type="text" id="volume"
+          placeholder="Volume larutan (mL)">
+        `;
+      }
+
+      // MOLARITAS
+
+      else if(menu === "molaritas"){
+
+        form.innerHTML = `
+          <div class="form-title">
+            Kalkulator Molaritas
+          </div>
+
+          <input type="text" id="massa"
+          placeholder="Massa zat (gram)">
+
+          <input type="text" id="bm"
+          placeholder="Berat Molekul (BM)">
+
+          <input type="text" id="volume"
+          placeholder="Volume larutan (mL)">
+        `;
+      }
+
+      // BE
+
+      else if(menu === "be"){
+
+        form.innerHTML = `
+          <div class="form-title">
+            Kalkulator BE
+          </div>
+
+          <input type="text" id="rumusBE"
+          placeholder="Contoh: H2SO4">
+
+          <input type="text" id="valensi"
+          placeholder="Valensi">
+        `;
+      }
+
+      // BM
+
+      else if(menu === "bm"){
+
+        form.innerHTML = `
+          <div class="form-title">
+            Kalkulator BM
+          </div>
+
+          <input type="text" id="rumusBM"
+          placeholder="Contoh: H2O atau NaCl">
+        `;
+      }
+
+      // AR
+
+      else if(menu === "ar"){
+
+        form.innerHTML = `
+          <div class="form-title">
+            Kalkulator Ar
+          </div>
+
+          <input type="text" id="unsur"
+          placeholder="Contoh: Na atau O">
+        `;
+      }
+
+      // SUHU
+
+      else if(menu === "suhu"){
+
+        form.innerHTML = `
+          <div class="form-title">
+            Konversi Suhu
+          </div>
+
+          <select id="jenisSuhu">
+
+            <option value="ck">
+              Celcius ke Kelvin
+            </option>
+
+            <option value="cf">
+              Celcius ke Fahrenheit
+            </option>
+
+            <option value="cr">
+              Celcius ke Reamur
+            </option>
+
+            <option value="kc">
+              Kelvin ke Celcius
+            </option>
+
+            <option value="kf">
+              Kelvin ke Fahrenheit
+            </option>
+
+            <option value="kr">
+              Kelvin ke Reamur
+            </option>
+
+            <option value="fc">
+              Fahrenheit ke Celcius
+            </option>
+
+            <option value="fk">
+              Fahrenheit ke Kelvin
+            </option>
+
+            <option value="fr">
+              Fahrenheit ke Reamur
+            </option>
+
+            <option value="rc">
+              Reamur ke Celcius
+            </option>
+
+            <option value="rf">
+              Reamur ke Fahrenheit
+            </option>
+
+            <option value="rk">
+              Reamur ke Kelvin
+            </option>
+
+          </select>
+
+          <input type="text" id="suhu"
+          placeholder="Masukkan suhu">
+        `;
+      }
+
+      // PPM
+
+      else if(menu === "ppm"){
+
+        form.innerHTML = `
+          <div class="form-title">
+            Kalkulator PPM
+          </div>
+
+          <input type="text" id="massa"
+          placeholder="Massa zat terlarut (mg)">
+
+          <input type="text" id="volume"
+          placeholder="Volume larutan (L)">
+        `;
+      }
+    }
+
+    // =====================================
+    // HITUNG
+    // =====================================
+
+    function hitung(){
+
+      let menu = document
+        .getElementById("menu")
+        .value;
+
+      let hasil = document
+        .getElementById("hasil");
+
+      // NORMALITAS
+
+      if(menu === "normalitas"){
+
+        let massa = angka("massa");
+        let be = angka("be");
+        let volume = angka("volume");
+
+        let normalitas =
+          (massa / be) / (volume / 1000);
+
+        hasil.innerHTML =
+          `Normalitas = ${normalitas.toFixed(4)} N`;
+      }
+
+      // MOLARITAS
+
+      else if(menu === "molaritas"){
+
+        let massa = angka("massa");
+        let bm = angka("bm");
+        let volume = angka("volume");
+
+        let molaritas =
+          (massa / bm) / (volume / 1000);
+
+        hasil.innerHTML =
+          `Molaritas = ${molaritas.toFixed(4)} M`;
+      }
+
+      // BE
+
+      else if(menu === "be"){
+
+        let rumus = document
+          .getElementById("rumusBE")
+          .value;
+
+        let valensi = angka("valensi");
+
+        let bm = hitungBM(rumus);
+
+        let be = bm / valensi;
+
+        hasil.innerHTML =
+          `BM ${rumus} = ${bm}<br>
+           BE ${rumus} = ${be.toFixed(4)}`;
+      }
+
+      // BM
+
+      else if(menu === "bm"){
+
+        let rumus = document
+          .getElementById("rumusBM")
+          .value;
+
+        let bm = hitungBM(rumus);
+
+        hasil.innerHTML =
+          `BM ${rumus} = ${bm}`;
+      }
+
+      // AR
+
+      else if(menu === "ar"){
+
+        let unsur = document
+          .getElementById("unsur")
+          .value;
+
+        if(dataAr[unsur]){
+
+          hasil.innerHTML =
+            `Ar ${unsur} = ${dataAr[unsur]}`;
+        }
+
+        else{
+
+          hasil.innerHTML =
+            `Unsur tidak ditemukan`;
+        }
+      }
+
+      // SUHU
+
+      else if(menu === "suhu"){
+
+        let jenis = document
+          .getElementById("jenisSuhu")
+          .value;
+
+        let suhu = angka("suhu");
+
+        let hasilSuhu = 0;
+        let satuan = "";
+
+        if(jenis === "ck"){
+          hasilSuhu = suhu + 273.15;
+          satuan = "K";
+        }
+
+        else if(jenis === "cf"){
+          hasilSuhu = (suhu * 9/5) + 32;
+          satuan = "°F";
+        }
+
+        else if(jenis === "cr"){
+          hasilSuhu = suhu * 4/5;
+          satuan = "°Re";
+        }
+
+        else if(jenis === "kc"){
+          hasilSuhu = suhu - 273.15;
+          satuan = "°C";
+        }
+
+        else if(jenis === "kf"){
+          hasilSuhu =
+            ((suhu - 273.15) * 9/5) + 32;
+          satuan = "°F";
+        }
+
+        else if(jenis === "kr"){
+          hasilSuhu =
+            (suhu - 273.15) * 4/5;
+          satuan = "°Re";
+        }
+
+        else if(jenis === "fc"){
+          hasilSuhu =
+            (suhu - 32) * 5/9;
+          satuan = "°C";
+        }
+
+        else if(jenis === "fk"){
+          hasilSuhu =
+            ((suhu - 32) * 5/9) + 273.15;
+          satuan = "K";
+        }
+
+        else if(jenis === "fr"){
+          hasilSuhu =
+            (suhu - 32) * 4/9;
+          satuan = "°Re";
+        }
+
+        else if(jenis === "rc"){
+          hasilSuhu =
+            suhu * 5/4;
+          satuan = "°C";
+        }
+
+        else if(jenis === "rf"){
+          hasilSuhu =
+            (suhu * 9/4) + 32;
+          satuan = "°F";
+        }
+
+        else if(jenis === "rk"){
+          hasilSuhu =
+            (suhu * 5/4) + 273.15;
+          satuan = "K";
+        }
+
+        hasil.innerHTML =
+          `Hasil = ${hasilSuhu.toFixed(2)} ${satuan}`;
+      }
+
+      // PPM
+
+      else if(menu === "ppm"){
+
+        let massa = angka("massa");
+        let volume = angka("volume");
+
+        let ppm = massa / volume;
+
+        hasil.innerHTML =
+          `PPM = ${ppm.toFixed(4)} ppm`;
+      }
+    }
+
+    ubahForm();
+
+  </script>
+
+</body>
+</html>
